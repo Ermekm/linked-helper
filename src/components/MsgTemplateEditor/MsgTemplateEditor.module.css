@@ -1,0 +1,41 @@
+.btn {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 8px;
+    color: inherit;
+    font-weight: 700;
+}
+
+.varNames {
+    margin-bottom: 15px;
+}
+
+.varNameBtn {
+    margin-right: 8px;
+    padding: 8px 10px;
+    color: #64ab60;
+    background-color: #37393b;
+    border: none;
+    border-radius: 5px;
+}
+
+.conditionBtn {
+    margin-bottom: 15px;
+    text-transform: uppercase;
+    background-color: #0177B5;
+}
+
+.previewBtn {
+    background-color: #3b6539;
+    color: #FFF;
+    margin-right: 15px;
+}
+
+.saveBtn {
+    background-color: #0177B5;
+    margin-right: 15px;
+}
+
+.closeBtn {
+    background-color: rgb(167, 42, 42);
+}

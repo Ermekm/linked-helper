@@ -1,0 +1,47 @@
+.preview__text {
+    margin-bottom: 20px;
+    padding: 12px;
+    border: 1px solid #0177B5;
+    border-radius: 8px;
+}
+
+.preview__vars {
+    margin-bottom: 20px;
+}
+
+.preview__var {
+    background: #37393b;
+    border-radius: 0;
+    border: 1px solid #37393b;
+    border-radius: 8px;
+    font-size: 14px;
+    line-height: 1.5;
+    padding: 8px;
+    resize: none;
+    transition: border-color 150ms ease;
+    color: #CBCBCB;
+    margin-right: 12px;
+}
+
+.preview__var:hover {
+    border-color: #0177B5;
+}
+
+.preview__var:focus {
+    outline: none;
+    border-color: #0177B5;
+}
+
+.preview__var::placeholder {
+    color: #c6c6c6;
+}
+
+.preview__close {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 8px;
+    color: inherit;
+    font-weight: 700;
+    background-color: rgb(167, 42, 42);
+    text-transform: uppercase;
+}

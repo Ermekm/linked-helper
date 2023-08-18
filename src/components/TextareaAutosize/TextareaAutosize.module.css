@@ -1,0 +1,26 @@
+.textarea {
+    background: #37393b;
+    border-radius: 0;
+    border: 1px solid #37393b;
+    border-radius: 8px;
+    font-size: 14px;
+    line-height: 1.5;
+    padding: 8px;
+    resize: none;
+    transition: border-color 150ms ease;
+    width: 100%;
+    color: #CBCBCB;
+}
+
+.textarea:hover {
+    border-color: #0177B5;
+}
+
+.textarea:focus {
+    outline: none;
+    border-color: #0177B5;
+}
+
+.textarea::placeholder {
+    color: #c6c6c6;
+}

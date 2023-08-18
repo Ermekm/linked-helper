@@ -1,0 +1,40 @@
+.label {
+    margin: 0 15px 15px 0;
+    font-weight: 700;
+    text-transform: uppercase;
+    width: 50px;
+}
+
+.if {
+    color: #7492d7;
+}
+
+.then {
+    color: rgb(118, 171, 118);
+}
+
+.else {
+    color: rgb(92, 92, 191);
+}
+
+.textareaWrapper {
+    display: flex;
+    align-items: center;
+}
+
+.textarea {
+    margin-bottom: 20px;
+}
+
+.btn {
+    border: none;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-weight: 700;
+    color: inherit;
+}
+
+.deleteBtn {
+    background-color: rgb(167, 42, 42);
+    margin-bottom: 5px;
+}
