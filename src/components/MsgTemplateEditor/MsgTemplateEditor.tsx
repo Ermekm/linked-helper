@@ -10,37 +10,38 @@ import cls from './MsgTemplateEditor.module.css'
 
 interface MsgTemplateEditorProps {
     arrVarNames: string[],
-    template?: Template | null,
+    initialTemplate?: Template | null,
     callbackSave: (template: Template) => void,
     onClose?: () => void
 }
 
-const MsgTemplateEditor: FC<MsgTemplateEditorProps> = ({ arrVarNames, template, callbackSave, onClose }) => {
-    const [templateData, setTemplateData] = useState<Template>(template || createTemplate()) // If the template from the props is null create empty template
-    const [activeInputTemplate, setActiveInputTemplate] = useState<Template>(JSON.parse(JSON.stringify(templateData)))
-    const [additionalTextIndex, setAdditionalTextIndex] = useState<number | null>(null)
-    const [ifIndex, setIfIndex] = useState<number | null>(null)
+const MsgTemplateEditor: FC<MsgTemplateEditorProps> = ({ arrVarNames, initialTemplate, callbackSave, onClose }) => {
+    const [template, setTemplate] = useState<Template>(initialTemplate || createTemplate()) // If the template from the props is null create empty template
+    const [activeInputTemplate, setActiveInputTemplate] = useState<Template>(template)
+    const [additionalTextId, setAdditionalTextId] = useState<number | null>(null)
+    const [ifId, setIfId] = useState<number | null>(null)
     const inputRef = useRef<HTMLTextAreaElement | null>(null);
     const [modalActive, setModalActive] = useState<boolean>(false)
 
     useEffect(() => {
-        console.log(templateData)
-    }, [templateData])
+
+    })
 
 
     // Function that inserts variable name in the text input
     const insertVarNameInInput = (value: string): void => {
         const inputValue = inputRef.current?.value || "";
+        console.log(inputRef)
         const cursorPosition = inputRef.current?.selectionStart || 0;
         const valueToInput = "{" + value + "}"
         const activeInputTemplateCopy = JSON.parse(JSON.stringify(activeInputTemplate))
 
         // Update the input value by inserting the new text at the cursor position
-        if (additionalTextIndex !== null) {
+        if (additionalTextId !== null) {
             if (activeInputTemplateCopy.condition) {
-                let templateCopy = JSON.parse(JSON.stringify(activeInputTemplate))
-                let condition = templateCopy.condition[additionalTextIndex]
-                condition.additionalText = inputValue.slice(0, cursorPosition) + valueToInput + condition.additionalText.slice(cursorPosition)
+                let templateCopy: Template = JSON.parse(JSON.stringify(activeInputTemplate))
+                let condition = templateCopy.condition.find(cond => cond.id === additionalTextId)
+                condition!.additionalText = inputValue.slice(0, cursorPosition) + valueToInput + condition!.additionalText.slice(cursorPosition)
 
                 const updateTemplate = (object: Template, id: number, newData: Template): Template => {
                     if (object.id === id) {
@@ -58,24 +59,24 @@ const MsgTemplateEditor: FC<MsgTemplateEditorProps> = ({ arrVarNames, template, 
                     return object;
                 };
 
-                setTemplateData((prev) => {
+                setTemplate((prev) => {
                     const newCopy = JSON.parse(JSON.stringify(updateTemplate(prev, activeInputTemplate.id, templateCopy)))
-                    console.log(newCopy.condition[0].additionalText)
                     return newCopy
                 })
 
                 // let condition = activeInputTemplate.condition[additionalTextIndex]
                 // condition.additionalText = inputValue.slice(0, cursorPosition) + valueToInput + condition.additionalText.slice(cursorPosition)
             }
-        } else if (ifIndex !== null) {
-            if (activeInputTemplate.condition) {
-                let condition = activeInputTemplate.condition[ifIndex]
-                condition.if = inputValue.slice(0, cursorPosition) + valueToInput + condition.if.slice(cursorPosition)
-            }
         }
-        else {
-            activeInputTemplate.text = inputValue.slice(0, cursorPosition) + valueToInput + activeInputTemplate.text.slice(cursorPosition)
-        }
+        // else if (ifIndex !== null) {
+        //     if (activeInputTemplate.condition) {
+        //         let condition = activeInputTemplate.condition[ifIndex]
+        //         condition.if = inputValue.slice(0, cursorPosition) + valueToInput + condition.if.slice(cursorPosition)
+        //     }
+        // }
+        // else {
+        //     activeInputTemplate.text = inputValue.slice(0, cursorPosition) + valueToInput + activeInputTemplate.text.slice(cursorPosition)
+        // }
         // editTemplateData(activeInputTemplate.id, activeInputTemplate)
 
         // Move the cursor to the end of the textarea
@@ -103,8 +104,11 @@ const MsgTemplateEditor: FC<MsgTemplateEditorProps> = ({ arrVarNames, template, 
             return JSON.parse(JSON.stringify(template));
         };
 
-        setTemplateData(prev => {
-            if (!prev) return prev
+        setTemplate(prev => {
+            return updateTemplate(prev, activeInputTemplate?.id)
+        })
+
+        setActiveInputTemplate(prev => {
             return updateTemplate(prev, activeInputTemplate?.id)
         })
     }
@@ -112,7 +116,7 @@ const MsgTemplateEditor: FC<MsgTemplateEditorProps> = ({ arrVarNames, template, 
 
     // Takes id of template that needs to be updated and updatedTemplate. 
     // Looks for template with the same id as the id from the arguments and changes it to the updatedTemplate from the arguments.
-    const editTemplateData = (id: number, updatedTemplate: Template): void => {
+    const editTemplateData = (updatedTemplate: Template): void => {
 
         // Recursive function that performs edition of template
         const updateTemplate = (object: Template, id: number, newData: Template): Template => {
@@ -131,9 +135,9 @@ const MsgTemplateEditor: FC<MsgTemplateEditorProps> = ({ arrVarNames, template, 
             return object;
         };
 
-        setTemplateData((prev) => {
+        setTemplate((prev) => {
             if (!prev) return prev;
-            return updateTemplate(prev, id, updatedTemplate)
+            return updateTemplate(prev, updatedTemplate.id, updatedTemplate)
         })
     }
 
@@ -170,8 +174,8 @@ const MsgTemplateEditor: FC<MsgTemplateEditorProps> = ({ arrVarNames, template, 
             return newTemplate;
         }
 
-        const updatedTemplate = updateTemplate(templateData, conditionId)
-        setTemplateData({ ...updatedTemplate })
+        const updatedTemplate = updateTemplate(template, conditionId)
+        setTemplate({ ...updatedTemplate })
         setActiveInputTemplate({ ...updatedTemplate })
     }
 
@@ -200,13 +204,13 @@ const MsgTemplateEditor: FC<MsgTemplateEditorProps> = ({ arrVarNames, template, 
                 onClick={addNewCondition}
             >if | then | else</button>
             <IfThenElse
-                template={templateData}
+                template={template}
                 nestingLvl={0}
                 editTemplateData={editTemplateData}
                 setRef={setRef}
                 setActiveInputTemplate={setActiveInputTemplate}
-                setIfIndex={setIfIndex}
-                setAdditionalTextIndex={setAdditionalTextIndex}
+                setIfId={setIfId}
+                setAdditionalTextId={setAdditionalTextId}
                 deleteTemplateById={deleteConditionById}
             />
             <button
@@ -214,7 +218,7 @@ const MsgTemplateEditor: FC<MsgTemplateEditorProps> = ({ arrVarNames, template, 
                 className={classNames(cls.previewBtn, {}, [cls.btn])}
             >Preview</button>
             <button
-                onClick={() => callbackSave(templateData)}
+                onClick={() => callbackSave(template)}
                 className={classNames(cls.saveBtn, {}, [cls.btn])}
             >Save</button>
             <button
@@ -222,7 +226,7 @@ const MsgTemplateEditor: FC<MsgTemplateEditorProps> = ({ arrVarNames, template, 
                 className={classNames(cls.closeBtn, {}, [cls.btn])}
             >Close</button>
             <Modal modalActive={modalActive} setModalActive={setModalActive}>
-                <TemplatePreview arrVarNames={arrVarNames} template={templateData} onClose={() => setModalActive(false)} ></TemplatePreview>
+                <TemplatePreview arrVarNames={arrVarNames} template={template} onClose={() => setModalActive(false)} ></TemplatePreview>
             </Modal>
         </div>
     )

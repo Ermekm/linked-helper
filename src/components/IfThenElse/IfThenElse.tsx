@@ -10,9 +10,9 @@ interface IfThenElseProps {
     label?: string | null,
     setActiveInputTemplate: (template: Template) => void,
     setRef: (ref: HTMLTextAreaElement) => void,
-    editTemplateData: (id: number, updatedTemplate: Template) => void,
-    setAdditionalTextIndex: (index: number | null) => void
-    setIfIndex: (index: number | null) => void
+    editTemplateData: (updatedTemplate: Template) => void,
+    setAdditionalTextId: (index: number | null) => void
+    setIfId: (index: number | null) => void
     deleteTemplateById: (id: number) => void
 }
 
@@ -22,10 +22,10 @@ const IfThenElse: FC<IfThenElseProps> = (props) => {
         nestingLvl,
         label,
         setActiveInputTemplate,
-        setIfIndex,
+        setIfId,
         setRef,
         editTemplateData,
-        setAdditionalTextIndex,
+        setAdditionalTextId,
         deleteTemplateById
     } = props
 
@@ -38,15 +38,16 @@ const IfThenElse: FC<IfThenElseProps> = (props) => {
                 <TextareaAutosize
                     className={cls.textarea}
                     value={template.text}
+                    name="text"
                     onChange={(e) => {
                         template.text = e.target.value
-                        editTemplateData(template.id, template)
+                        editTemplateData(template)
                     }}
                     onFocus={(e) => {
                         setRef(e.target)
                         setActiveInputTemplate(template)
-                        setAdditionalTextIndex(null)
-                        setIfIndex(null)
+                        setAdditionalTextId(null)
+                        setIfId(null)
                     }}
                     rows={1}
                     autoFocus={nestingLvl === 0}
@@ -67,16 +68,18 @@ const IfThenElse: FC<IfThenElseProps> = (props) => {
                         <TextareaAutosize
                             className={cls.textarea}
                             value={template.condition[index].if}
+                            name="if"
+                            data-index={index}
                             onChange={(e) => {
                                 if (!template.condition) return
                                 template.condition[index].if = e.target.value
-                                editTemplateData(template.id, template)
+                                editTemplateData(template)
                             }}
                             onFocus={(e) => {
                                 setRef(e.target)
                                 setActiveInputTemplate(template)
-                                setAdditionalTextIndex(null)
-                                setIfIndex(index)
+                                setAdditionalTextId(null)
+                                setIfId(el.id)
                             }}
                             rows={1}
                         />
@@ -88,8 +91,8 @@ const IfThenElse: FC<IfThenElseProps> = (props) => {
                         editTemplateData={editTemplateData}
                         setRef={setRef}
                         setActiveInputTemplate={setActiveInputTemplate}
-                        setIfIndex={setIfIndex}
-                        setAdditionalTextIndex={setAdditionalTextIndex}
+                        setIfId={setIfId}
+                        setAdditionalTextId={setAdditionalTextId}
                         deleteTemplateById={deleteTemplateById} />
                     <IfThenElse
                         template={el.else}
@@ -98,8 +101,8 @@ const IfThenElse: FC<IfThenElseProps> = (props) => {
                         editTemplateData={editTemplateData}
                         setRef={setRef}
                         setActiveInputTemplate={setActiveInputTemplate}
-                        setIfIndex={setIfIndex}
-                        setAdditionalTextIndex={setAdditionalTextIndex}
+                        setIfId={setIfId}
+                        setAdditionalTextId={setAdditionalTextId}
                         deleteTemplateById={deleteTemplateById}
                     />
                     <TextareaAutosize
@@ -108,13 +111,14 @@ const IfThenElse: FC<IfThenElseProps> = (props) => {
                         onChange={(e) => {
                             if (!template.condition) return
                             template.condition[index].additionalText = e.target.value
-                            editTemplateData(template.id, template)
+                            editTemplateData(template)
                         }}
+                        name="additionalText"
                         onFocus={(e) => {
                             setRef(e.target)
-                            setActiveInputTemplate(template)
-                            setAdditionalTextIndex(index)
-                            setIfIndex(null)
+                            setActiveInputTemplate(JSON.parse(JSON.stringify(template)))
+                            setAdditionalTextId(el.id)
+                            setIfId(null)
                         }}
                         rows={1}
                     />

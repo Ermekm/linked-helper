@@ -23,7 +23,7 @@ function App() {
       <Drawer isActive={msgTemplateEditorActive} onClose={() => setMsgTemplateEditorActive(false)}>
         <MsgTemplateEditor
           arrVarNames={arrVarNames}
-          template={template}
+          initialTemplate={template}
           callbackSave={callbackSave}
           onClose={() => setMsgTemplateEditorActive(false)} />
       </Drawer>
