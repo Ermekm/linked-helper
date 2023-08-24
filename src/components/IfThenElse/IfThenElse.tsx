@@ -1,35 +1,52 @@
-import { FC } from "react"
-import { Template } from "../../types"
+import { ChangeEvent, FC } from "react"
+import { Condition, T, Template, TemplateElement } from "../../types"
 import { TextareaAutosize } from "../TextareaAutosize/TextareaAutosize"
 import cls from "./IfThenElse.module.css"
 import { classNames } from "../../helpers/className"
 
 interface IfThenElseProps {
     template: Template,
+    id: number,
     nestingLvl: number,
     label?: string | null,
-    setActiveInputTemplate: (template: Template) => void,
+    setActiveElementId: (id: number) => void,
     setRef: (ref: HTMLTextAreaElement) => void,
-    editTemplateData: (updatedTemplate: Template) => void,
+    editTemplateEl: (templateEl: TemplateElement) => void,
     setAdditionalTextId: (index: number | null) => void
     setIfId: (index: number | null) => void
-    deleteTemplateById: (id: number) => void
+    deleteConditionById: (id: number, elementId: number) => void
 }
 
 const IfThenElse: FC<IfThenElseProps> = (props) => {
     const {
         template,
+        id,
         nestingLvl,
         label,
-        setActiveInputTemplate,
+        setActiveElementId,
         setIfId,
         setRef,
-        editTemplateData,
+        editTemplateEl,
         setAdditionalTextId,
-        deleteTemplateById
+        deleteConditionById
     } = props
-
     const indentation = nestingLvl * 20
+    const element = template[id]
+
+    const onTemplateElChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
+        const newTemplateEl: TemplateElement = { ...element, text: e.target.value }
+        editTemplateEl(newTemplateEl)
+    }
+
+    const onConditionChange = (e: ChangeEvent<HTMLTextAreaElement>, condition: Condition, key: T) => {
+        const newCondition: Condition = { ...condition, [key]: e.target.value }
+        const newTemplateEl = { ...element }
+        newTemplateEl.conditions = newTemplateEl.conditions.map((cond) => cond.id === newCondition.id ? newCondition : cond)
+        editTemplateEl(newTemplateEl)
+    }
+
+
+    if (!element) return null
 
     return (
         <div>
@@ -37,88 +54,80 @@ const IfThenElse: FC<IfThenElseProps> = (props) => {
                 {label && <label className={classNames(cls.label, {}, [cls[label]])}>{label}</label>}
                 <TextareaAutosize
                     className={cls.textarea}
-                    value={template.text}
+                    value={element.text}
                     name="text"
-                    onChange={(e) => {
-                        template.text = e.target.value
-                        editTemplateData(template)
-                    }}
+                    onChange={onTemplateElChange}
                     onFocus={(e) => {
+                        setActiveElementId(element.id)
                         setRef(e.target)
-                        setActiveInputTemplate(template)
-                        setAdditionalTextId(null)
-                        setIfId(null)
+                        // setActiveInputTemplate(template)
+                        // setAdditionalTextId(null)
+                        // setIfId(null)
                     }}
                     rows={1}
-                    autoFocus={nestingLvl === 0}
                 />
             </div>
-            {template.condition && template.condition.map((el, index) =>
+            {element.conditions && element.conditions.map((cond) =>
                 <div
-                    key={el.id} style={{ marginLeft: `${indentation}px` }}
+                    key={cond.id} style={{ marginLeft: `${indentation}px` }}
                 >
                     <button
-                        onClick={() => {
-                            deleteTemplateById(el.id)
-                        }}
+                        onClick={() => deleteConditionById(cond.id, element.id)}
                         className={classNames(cls.deleteBtn, {}, [cls.btn])}
                     >Delete</button>
                     <div className={cls.textareaWrapper}>
                         <label className={classNames(cls.label, {}, [cls.if])}>if</label>
                         <TextareaAutosize
                             className={cls.textarea}
-                            value={template.condition[index].if}
+                            value={cond.if}
                             name="if"
-                            data-index={index}
-                            onChange={(e) => {
-                                if (!template.condition) return
-                                template.condition[index].if = e.target.value
-                                editTemplateData(template)
-                            }}
+                            data-condition-id={cond.id}
+                            onChange={(e) => onConditionChange(e, cond, 'if')}
                             onFocus={(e) => {
                                 setRef(e.target)
-                                setActiveInputTemplate(template)
-                                setAdditionalTextId(null)
-                                setIfId(el.id)
+                                setActiveElementId(element.id)
+                                // setActiveInputTemplate(template)
+                                // setAdditionalTextId(null)
+                                // setIfId(el.id)
                             }}
                             rows={1}
                         />
                     </div>
                     <IfThenElse
-                        template={el.then}
+                        template={template}
+                        id={cond.then}
                         label={"then"}
                         nestingLvl={nestingLvl + 1}
-                        editTemplateData={editTemplateData}
+                        editTemplateEl={editTemplateEl}
                         setRef={setRef}
-                        setActiveInputTemplate={setActiveInputTemplate}
+                        setActiveElementId={setActiveElementId}
                         setIfId={setIfId}
                         setAdditionalTextId={setAdditionalTextId}
-                        deleteTemplateById={deleteTemplateById} />
+                        deleteConditionById={deleteConditionById} />
                     <IfThenElse
-                        template={el.else}
+                        template={template}
+                        id={cond.else}
                         label={"else"}
                         nestingLvl={nestingLvl + 1}
-                        editTemplateData={editTemplateData}
+                        editTemplateEl={editTemplateEl}
                         setRef={setRef}
-                        setActiveInputTemplate={setActiveInputTemplate}
+                        setActiveElementId={setActiveElementId}
                         setIfId={setIfId}
                         setAdditionalTextId={setAdditionalTextId}
-                        deleteTemplateById={deleteTemplateById}
+                        deleteConditionById={deleteConditionById}
                     />
                     <TextareaAutosize
                         className={cls.textarea}
-                        value={el.additionalText}
-                        onChange={(e) => {
-                            if (!template.condition) return
-                            template.condition[index].additionalText = e.target.value
-                            editTemplateData(template)
-                        }}
+                        value={cond.additionalText}
+                        onChange={(e) => onConditionChange(e, cond, 'additionalText')}
                         name="additionalText"
+                        data-condition-id={cond.id}
                         onFocus={(e) => {
                             setRef(e.target)
-                            setActiveInputTemplate(JSON.parse(JSON.stringify(template)))
-                            setAdditionalTextId(el.id)
-                            setIfId(null)
+                            setActiveElementId(element.id)
+                            // setActiveInputTemplate(JSON.parse(JSON.stringify(template)))
+                            // setAdditionalTextId(el.id)
+                            // setIfId(null)
                         }}
                         rows={1}
                     />

@@ -11,21 +11,25 @@ export function insertValues(str: string, values: any): string {
     return ans
 }
 
-function generateMsg(template: Template, values: object): string {
-    let str = insertValues(template.text, values);
-    template.condition.forEach(cond => {
-        if (insertValues(cond.if, values)) {
-            str += generateMsg(cond.then, values)
-        } else {
-            str += generateMsg(cond.else, values)
-        }
-        str += cond.additionalText ? " " + cond.additionalText : ""
-    })
+// function generateMsg(template: Template, values: object): string {
+//     let str = insertValues(template.text, values);
+//     template.condition.forEach(cond => {
+//         if (insertValues(cond.if, values)) {
+//             str += generateMsg(cond.then, values)
+//         } else {
+//             str += generateMsg(cond.else, values)
+//         }
+//         str += cond.additionalText ? " " + cond.additionalText : ""
+//     })
 
-    return " " + str;
-}
+//     return " " + str;
+// }
+
+// export function msgGenerator(template: Template, values: object): string {
+//     return generateMsg(template, values).trim()
+// }
 
 export function msgGenerator(template: Template, values: object): string {
-    return generateMsg(template, values).trim()
+    return ""
 }
 

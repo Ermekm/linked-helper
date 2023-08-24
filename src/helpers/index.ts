@@ -1,4 +1,4 @@
-import { Condition, Template } from "../types"
+import { Condition, Template, TemplateElement } from "../types"
 
 function createId(): number {
     return Date.now() + Math.random()
@@ -6,28 +6,34 @@ function createId(): number {
 
 export function createTemplate(): Template {
     const newTemplate = {
-        id: createId(),
-        text: "",
-        condition: []
+        0: {
+            id: 0,
+            text: "",
+            conditions: []
+        }
     }
     return newTemplate
 }
 
-export function createCondition(): Condition {
+export function createTemplateElement(): TemplateElement {
+    const newTemplateEl = {
+        id: createId(),
+        text: "",
+        conditions: []
+    }
+    return newTemplateEl
+}
+
+export function createCondition(): [Condition, TemplateElement, TemplateElement] {
+    const newThenTemplateEl = createTemplateElement()
+    const newElseTemplateEl = createTemplateElement()
+
     const newCondition = {
         id: createId(),
         if: "",
-        then: {
-            id: createId(),
-            text: "",
-            condition: []
-        },
-        else: {
-            id: createId(),
-            text: "",
-            condition: []
-        },
+        then: newThenTemplateEl.id,
+        else: newElseTemplateEl.id,
         additionalText: ""
     }
-    return newCondition
+    return [newCondition, newThenTemplateEl, newElseTemplateEl]
 }
