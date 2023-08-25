@@ -1,4 +1,4 @@
-import { Template } from "../../types";
+import { Template, TemplateElement } from "../../types";
 
 // Takes string as an argument and inserts values in the string
 export function insertValues(str: string, values: any): string {
@@ -11,25 +11,22 @@ export function insertValues(str: string, values: any): string {
     return ans
 }
 
-// function generateMsg(template: Template, values: object): string {
-//     let str = insertValues(template.text, values);
-//     template.condition.forEach(cond => {
-//         if (insertValues(cond.if, values)) {
-//             str += generateMsg(cond.then, values)
-//         } else {
-//             str += generateMsg(cond.else, values)
-//         }
-//         str += cond.additionalText ? " " + cond.additionalText : ""
-//     })
+function generateMsg(template: Template, id: number, values: object): string {
+    const element: TemplateElement = template[id]
+    let str = insertValues(element.text, values);
+    element.conditions.forEach(cond => {
+        if (insertValues(cond.if, values)) {
+            str += generateMsg(template, cond.then, values)
+        } else {
+            str += generateMsg(template, cond.else, values)
+        }
+        str += cond.additionalText ? " " + cond.additionalText : ""
+    })
 
-//     return " " + str;
-// }
-
-// export function msgGenerator(template: Template, values: object): string {
-//     return generateMsg(template, values).trim()
-// }
+    return " " + str;
+}
 
 export function msgGenerator(template: Template, values: object): string {
-    return ""
+    return generateMsg(template, 0, values).trim()
 }
 
