@@ -12,8 +12,6 @@ interface IfThenElseProps {
     setActiveElementId: (id: number) => void,
     setRef: (ref: HTMLTextAreaElement) => void,
     editTemplateEl: (templateEl: TemplateElement) => void,
-    setAdditionalTextId: (index: number | null) => void
-    setIfId: (index: number | null) => void
     deleteConditionById: (id: number, elementId: number) => void
 }
 
@@ -24,10 +22,8 @@ const IfThenElse: FC<IfThenElseProps> = (props) => {
         nestingLvl,
         label,
         setActiveElementId,
-        setIfId,
         setRef,
         editTemplateEl,
-        setAdditionalTextId,
         deleteConditionById
     } = props
     const indentation = nestingLvl * 20
@@ -60,9 +56,6 @@ const IfThenElse: FC<IfThenElseProps> = (props) => {
                     onFocus={(e) => {
                         setActiveElementId(element.id)
                         setRef(e.target)
-                        // setActiveInputTemplate(template)
-                        // setAdditionalTextId(null)
-                        // setIfId(null)
                     }}
                     rows={1}
                 />
@@ -86,9 +79,6 @@ const IfThenElse: FC<IfThenElseProps> = (props) => {
                             onFocus={(e) => {
                                 setRef(e.target)
                                 setActiveElementId(element.id)
-                                // setActiveInputTemplate(template)
-                                // setAdditionalTextId(null)
-                                // setIfId(el.id)
                             }}
                             rows={1}
                         />
@@ -101,8 +91,6 @@ const IfThenElse: FC<IfThenElseProps> = (props) => {
                         editTemplateEl={editTemplateEl}
                         setRef={setRef}
                         setActiveElementId={setActiveElementId}
-                        setIfId={setIfId}
-                        setAdditionalTextId={setAdditionalTextId}
                         deleteConditionById={deleteConditionById} />
                     <IfThenElse
                         template={template}
@@ -112,8 +100,6 @@ const IfThenElse: FC<IfThenElseProps> = (props) => {
                         editTemplateEl={editTemplateEl}
                         setRef={setRef}
                         setActiveElementId={setActiveElementId}
-                        setIfId={setIfId}
-                        setAdditionalTextId={setAdditionalTextId}
                         deleteConditionById={deleteConditionById}
                     />
                     <TextareaAutosize
@@ -125,9 +111,6 @@ const IfThenElse: FC<IfThenElseProps> = (props) => {
                         onFocus={(e) => {
                             setRef(e.target)
                             setActiveElementId(element.id)
-                            // setActiveInputTemplate(JSON.parse(JSON.stringify(template)))
-                            // setAdditionalTextId(el.id)
-                            // setIfId(null)
                         }}
                         rows={1}
                     />
