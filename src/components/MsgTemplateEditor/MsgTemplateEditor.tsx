@@ -1,12 +1,14 @@
-import { FC, useRef, useState } from 'react'
+import { FC, useContext, useRef, useState } from 'react'
 import IfThenElse from '../IfThenElse/IfThenElse';
-import { T, Template, TemplateElement } from '../../types';
+import { ConditionTextFields, IModalContext, Template, TemplateElement } from '../../types';
 import { Modal } from '../Modal/Modal';
 import { TemplatePreview } from '../TemplatePreview/TemplatePreview';
 import { createCondition, createTemplate } from '../../helpers';
+import * as Constants from "../../constansts/index"
 import { classNames } from '../../helpers/className';
 
 import cls from './MsgTemplateEditor.module.css'
+import { ModalContext } from '../../context/modalContext';
 
 interface MsgTemplateEditorProps {
     arrVarNames: string[],
@@ -16,64 +18,74 @@ interface MsgTemplateEditorProps {
 }
 
 const MsgTemplateEditor: FC<MsgTemplateEditorProps> = ({ arrVarNames, initialTemplate, callbackSave, onClose }) => {
-    const [template, setTemplate] = useState<Template>(initialTemplate || createTemplate()) // If the template from the props is null create empty template
-    const [activeElementId, setActiveElementId] = useState<number>(0)
+    const [template, setTemplate] = useState<Template>(initialTemplate || createTemplate(arrVarNames)) // If the template from the props is null create empty template
+    const [activeElementId, setActiveElementId] = useState<number>(Constants.ROOT_ELEMENT_ID)
     const inputRef = useRef<HTMLTextAreaElement | null>(null);
-    const [modalActive, setModalActive] = useState<boolean>(false)
+    const modal = useContext(ModalContext) as IModalContext
+
 
     // Function that inserts variable name in the text input
     const insertVarNameInInput = (value: string): void => {
-        const elementId = template[activeElementId] ? activeElementId : 0
-        const conditionId = inputRef.current?.dataset?.conditionId
+        const elements = template.elements
+        const elementId = elements[activeElementId] ? activeElementId : Constants.ROOT_ELEMENT_ID
+        const conditionId = inputRef.current?.dataset?.conditionId // id of condition to instert text is saved in data-* attribute
+        const conditionToEdit = elements[elementId].conditions.find(cond => cond.id === Number(conditionId))
         const cursorPosition = inputRef.current?.selectionStart || 0;
         const valueToInput = "{" + value + "}"
-        if (conditionId) {
+        if (conditionToEdit) {
             if (!inputRef.current?.name) return
-            const key = inputRef.current?.name as T
-            const conditionToEdit = template[elementId].conditions.find(cond => cond.id === parseInt(conditionId))
+            const key = inputRef.current?.name as ConditionTextFields // field of condition to insert text is saved in data-* attribute 
             if (!conditionToEdit) return
             const elementValue = conditionToEdit[key]
             const textToInput = elementValue.slice(0, cursorPosition) + valueToInput + elementValue.slice(cursorPosition)
             setTemplate((prev) => {
                 const templateCopy = {
                     ...prev,
-                    [elementId]: {
-                        ...prev[elementId],
-                        conditions: prev[elementId].conditions.map(cond => {
-                            return cond.id === parseInt(conditionId)
-                                ? { ...cond, [key]: textToInput }
-                                : cond
+                    elements: {
+                        ...prev.elements,
+                        [elementId]: {
+                            ...prev.elements[elementId],
+                            conditions: prev.elements[elementId].conditions.map(cond => {
+                                return cond.id === Number(conditionId)
+                                    ? { ...cond, [key]: textToInput }
+                                    : cond
+                            }
+                            )
                         }
-                        )
                     }
                 }
                 return templateCopy
             })
         } else {
-            const elementValue = template[elementId].text;
+            const elementValue = elements[elementId].text;
             const textToInput = elementValue.slice(0, cursorPosition) + valueToInput + elementValue.slice(cursorPosition)
             setTemplate((prev) => {
-                const templateCopy = { ...prev, [elementId]: { ...prev[elementId], text: textToInput } }
+                const templateCopy = { ...prev, elements: { ...prev.elements, [elementId]: { ...prev.elements[elementId], text: textToInput } } }
                 return templateCopy
             })
         }
     };
 
-
+    // Adds new condition to the template
     const addNewCondition = (): void => {
+        // createCondition() function returns newCondition and template elements. 
+        // Ids of template elements was saved in then, else fields of condition
         const [newCondition, newThenTemplateEl, newElseTemplateEl] = createCondition()
-        const elementId = template[activeElementId] ? activeElementId : 0  // if activeElement was deleted insert condition in root element
+        const elementId = template.elements[activeElementId] ? activeElementId : Constants.ROOT_ELEMENT_ID  // if activeElement was deleted insert condition in root element
         const templateCopy: Template = {
             ...template,
-            [elementId]: {
-                ...template[elementId],
-                conditions: [
-                    newCondition,
-                    ...template[elementId].conditions
-                ]
-            },
-            [newThenTemplateEl.id]: newThenTemplateEl,
-            [newElseTemplateEl.id]: newElseTemplateEl
+            elements: {
+                ...template.elements,
+                [elementId]: {
+                    ...template.elements[elementId],
+                    conditions: [
+                        newCondition,
+                        ...template.elements[elementId].conditions
+                    ]
+                },
+                [newThenTemplateEl.id]: newThenTemplateEl,
+                [newElseTemplateEl.id]: newElseTemplateEl
+            }
         }
         setTemplate(templateCopy)
     }
@@ -81,35 +93,35 @@ const MsgTemplateEditor: FC<MsgTemplateEditorProps> = ({ arrVarNames, initialTem
 
     // Deletes condition by id
     const deleteConditionById = (conditionId: number, elementId: number): void => {
-        const conditionToDelete = template[elementId].conditions.find(cond => cond.id === conditionId)
+        const conditionToDelete = template.elements[elementId].conditions.find(cond => cond.id === conditionId)
         if (!conditionToDelete) return
         deleteAllChildren(conditionToDelete.then)
         deleteAllChildren(conditionToDelete.else)
         function deleteAllChildren(elementId: number) {
-            const element = template[elementId]
+            const element = template.elements[elementId]
             element.conditions.forEach((cond) => {
                 deleteAllChildren(cond.then)
                 deleteAllChildren(cond.else)
             })
             setTemplate((prev) => {
-                const templateCopy = { ...prev }
-                delete templateCopy[elementId]
+                const templateCopy = { ...prev, elements: { ...prev.elements } }
+                delete templateCopy.elements[elementId]
                 return templateCopy
             })
         }
         setTemplate((prev) => {
-            const newConditions = prev[elementId].conditions.filter(cond => cond.id !== conditionId)
-            const templateCopy = { ...prev, [elementId]: { ...prev[elementId], conditions: newConditions } }
+            const newConditions = prev.elements[elementId].conditions.filter(cond => cond.id !== conditionId)
+            const templateCopy = { ...prev, elements: { ...prev.elements, [elementId]: { ...prev.elements[elementId], conditions: newConditions } } }
             return templateCopy
         })
     }
 
-    // Takes id of template that needs to be updated and updatedTemplate. 
-    // Looks for template with the same id as the id from the arguments and changes it to the updatedTemplate from the arguments.
+    // Takes updated template element as argument
+    // changes old template element with the same id with the updated one
     const editTemplateEl = (templateEl: TemplateElement): void => {
         setTemplate((prev) => {
-            const newTemplate: Template = { ...prev };
-            newTemplate[templateEl.id] = templateEl
+            const newTemplate: Template = { ...prev, elements: { ...prev.elements } };
+            newTemplate.elements[templateEl.id] = templateEl
             return newTemplate
         })
     }
@@ -117,13 +129,20 @@ const MsgTemplateEditor: FC<MsgTemplateEditorProps> = ({ arrVarNames, initialTem
     const handleSave = () => {
         try {
             callbackSave(template)
+            alert('Template has been saved')
         } catch (error) {
+            alert('Something went wrong')
             console.log(error)
         }
     }
 
     const setRef = (ref: HTMLTextAreaElement) => {
         inputRef.current = ref
+    }
+
+    const openTemplatePreview = () => {
+        modal.start()
+        modal.setContent(<TemplatePreview arrVarNames={arrVarNames} template={template} />)
     }
 
 
@@ -148,14 +167,14 @@ const MsgTemplateEditor: FC<MsgTemplateEditorProps> = ({ arrVarNames, initialTem
             <IfThenElse
                 template={template}
                 nestingLvl={0}
-                id={0}
+                id={Constants.ROOT_ELEMENT_ID}
                 editTemplateEl={editTemplateEl}
                 setRef={setRef}
                 setActiveElementId={setActiveElementId}
                 deleteConditionById={deleteConditionById}
             />
             <button
-                onClick={() => setModalActive(true)}
+                onClick={openTemplatePreview}
                 className={classNames(cls.previewBtn, {}, [cls.btn])}
             >Preview</button>
             <button
@@ -166,9 +185,7 @@ const MsgTemplateEditor: FC<MsgTemplateEditorProps> = ({ arrVarNames, initialTem
                 onClick={onClose}
                 className={classNames(cls.closeBtn, {}, [cls.btn])}
             >Close</button>
-            <Modal modalActive={modalActive} setModalActive={setModalActive}>
-                <TemplatePreview arrVarNames={arrVarNames} template={template} onClose={() => setModalActive(false)} ></TemplatePreview>
-            </Modal>
+            <Modal />
         </div>
     )
 }

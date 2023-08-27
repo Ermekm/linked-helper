@@ -1,5 +1,5 @@
 import { ChangeEvent, FC } from "react"
-import { Condition, T, Template, TemplateElement } from "../../types"
+import { Condition, ConditionTextFields, Template, TemplateElement } from "../../types"
 import { TextareaAutosize } from "../TextareaAutosize/TextareaAutosize"
 import cls from "./IfThenElse.module.css"
 import { classNames } from "../../helpers/className"
@@ -15,6 +15,7 @@ interface IfThenElseProps {
     deleteConditionById: (id: number, elementId: number) => void
 }
 
+// Recursive component that renders if then else block
 const IfThenElse: FC<IfThenElseProps> = (props) => {
     const {
         template,
@@ -26,21 +27,21 @@ const IfThenElse: FC<IfThenElseProps> = (props) => {
         editTemplateEl,
         deleteConditionById
     } = props
+    // Identation variable is used for margins of conditions
     const indentation = nestingLvl * 20
-    const element = template[id]
+    const element = template.elements[id]
 
     const onTemplateElChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
         const newTemplateEl: TemplateElement = { ...element, text: e.target.value }
         editTemplateEl(newTemplateEl)
     }
 
-    const onConditionChange = (e: ChangeEvent<HTMLTextAreaElement>, condition: Condition, key: T) => {
+    const onConditionChange = (e: ChangeEvent<HTMLTextAreaElement>, condition: Condition, key: ConditionTextFields) => {
         const newCondition: Condition = { ...condition, [key]: e.target.value }
         const newTemplateEl = { ...element }
         newTemplateEl.conditions = newTemplateEl.conditions.map((cond) => cond.id === newCondition.id ? newCondition : cond)
         editTemplateEl(newTemplateEl)
     }
-
 
     if (!element) return null
 
@@ -57,7 +58,6 @@ const IfThenElse: FC<IfThenElseProps> = (props) => {
                         setActiveElementId(element.id)
                         setRef(e.target)
                     }}
-                    rows={1}
                 />
             </div>
             {element.conditions && element.conditions.map((cond) =>
@@ -73,8 +73,8 @@ const IfThenElse: FC<IfThenElseProps> = (props) => {
                         <TextareaAutosize
                             className={cls.textarea}
                             value={cond.if}
-                            name="if"
-                            data-condition-id={cond.id}
+                            name="if" //name is used to determine which field (if or additionalText) of condition to insert varName into
+                            data-condition-id={cond.id} // is used to determine id of condition to inster varName
                             onChange={(e) => onConditionChange(e, cond, 'if')}
                             onFocus={(e) => {
                                 setRef(e.target)
@@ -106,13 +106,12 @@ const IfThenElse: FC<IfThenElseProps> = (props) => {
                         className={cls.textarea}
                         value={cond.additionalText}
                         onChange={(e) => onConditionChange(e, cond, 'additionalText')}
-                        name="additionalText"
-                        data-condition-id={cond.id}
+                        name="additionalText" //name is used to determine which field (if or additionalText) of condition to insert varName into
+                        data-condition-id={cond.id} // is used to determine id of condition to inster varName
                         onFocus={(e) => {
                             setRef(e.target)
                             setActiveElementId(element.id)
                         }}
-                        rows={1}
                     />
                 </div>
             )}

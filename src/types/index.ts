@@ -1,7 +1,10 @@
-export type T = 'if' | 'additionalText'
+export type ConditionTextFields = 'if' | 'additionalText'
 
 export interface Template {
-    [key: string]: TemplateElement
+    arrVarNames: string[]
+    elements: {
+        [key: string]: TemplateElement;
+    }
 }
 
 export interface TemplateElement {
@@ -18,22 +21,10 @@ export interface Condition {
     additionalText: string;
 }
 
-// export interface Template {
-//     id: number,
-//     text: string;
-//     condition: {
-//         id: number,
-//         if: string;
-//         then: Template;
-//         else: Template;
-//         additionalText: string;
-//     }[]
-// }
-
-// export interface Condition {
-//     id: number
-//     if: string;
-//     then: Template;
-//     else: Template;
-//     additionalText: string;
-// }
+export interface IModalContext {
+    start: () => void,
+    destroy: () => void,
+    setContent: React.Dispatch<React.SetStateAction<JSX.Element | null>>,
+    content: JSX.Element | null,
+    isActive: boolean,
+}

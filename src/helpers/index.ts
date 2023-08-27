@@ -1,15 +1,23 @@
 import { Condition, Template, TemplateElement } from "../types"
+import * as Constants from '../constansts/index'
 
-function createId(): number {
-    return Date.now() + Math.random()
+function getRandomInt(max: number) {
+    return Math.floor(Math.random() * max);
 }
 
-export function createTemplate(): Template {
+function createId(): number {
+    return Date.now() + getRandomInt(1000)
+}
+
+export function createTemplate(arrVarNames: string[]): Template {
     const newTemplate = {
-        0: {
-            id: 0,
-            text: "",
-            conditions: []
+        arrVarNames,
+        elements: {
+            [Constants.ROOT_ELEMENT_ID]: {
+                id: Constants.ROOT_ELEMENT_ID,
+                text: "",
+                conditions: []
+            }
         }
     }
     return newTemplate
@@ -24,6 +32,8 @@ export function createTemplateElement(): TemplateElement {
     return newTemplateEl
 }
 
+// createCondition() returns array of condition and two template elements
+// Ids of template elements will be saved in then else fields of condition
 export function createCondition(): [Condition, TemplateElement, TemplateElement] {
     const newThenTemplateEl = createTemplateElement()
     const newElseTemplateEl = createTemplateElement()

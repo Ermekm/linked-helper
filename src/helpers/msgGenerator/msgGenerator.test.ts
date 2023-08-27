@@ -1,34 +1,18 @@
-import { templateWithMultipleConditions, templateWithMultipleNestedConditions, templateWithOneCondition, templateWithOneNestedCondition, templateWithoutConditions } from "./data";
+import {
+    emptyValues,
+    filledValues, 
+    oneFilledValue, 
+    twoFilledValues,
+    threeFilledValues, 
+    templateWithExtraVarName, 
+    templateWithMissingValue, 
+    templateWithMultipleConditions, 
+    templateWithMultipleNestedConditions, 
+    templateWithOneCondition, 
+    templateWithOneNestedCondition, 
+    templateWithoutConditions,
+} from "./data";
 import { msgGenerator } from "./msgGenerator";
-
-const filledValues = {
-    firstname: "John",
-    lastname: "Doe",
-    company: "Google",
-    position: "Hiring Recruiter",
-}
-
-const emptyValues = {
-    firstname: "",
-    lastname: "",
-    company: "",
-    position: "",
-}
-
-const oneFilledValue = {
-    firstname: "John",
-}
-
-const twoFilledValues = {
-    firstname: "John",
-    lastname: "Doe",
-}
-
-const threeFilledValues = {
-    firstname: "John",
-    lastname: "Doe",
-    company: "Google",
-}
 
 
 describe('Message Generator', () => {
@@ -91,4 +75,15 @@ describe('Message Generator', () => {
         expect(msgGenerator(templateWithMultipleNestedConditions, twoFilledValues))
             .toBe("Hi, John, you appeared in my 'You may know' list. Doe, I'm writing to connect with you. I'm hoping to expand my network with people from your company with your position. Bye");
     })
+
+    test('With missing value', () => {
+        expect(msgGenerator(templateWithMissingValue, twoFilledValues))
+            .toBe("HI, John I saw you work at");
+    })
+
+    test('With extra varName that is not in array', () => {
+        expect(msgGenerator(templateWithExtraVarName, filledValues))
+            .toBe("HI, John I saw you work at Google as {role}");
+    })
+
 });

@@ -1,17 +1,16 @@
-import { FC, ReactNode } from "react"
+import { useContext } from "react"
 import cls from "./Modal.module.css"
+import { ModalContext } from "../../context/modalContext"
+import { IModalContext } from "../../types"
 
-interface ModalProps {
-    modalActive: boolean,
-    setModalActive: (modalActive: boolean) => void,
-    children: ReactNode
-}
 
-export const Modal: FC<ModalProps> = ({ modalActive, setModalActive, children }) => {
+export const Modal = () => {
+    const modal = useContext(ModalContext) as IModalContext
+
     return (
-        <div className={modalActive ? [cls.modal, cls.modal_active].join(" ") : cls.modal} onClick={() => setModalActive(false)}>
+        <div className={modal.isActive ? [cls.modal, cls.modal_active].join(" ") : cls.modal} onClick={modal.destroy}>
             <div className={cls.modal__content} onClick={(e) => e.stopPropagation()}>
-                {children}
+                {modal.content}
             </div>
         </div>
     )

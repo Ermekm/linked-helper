@@ -10,6 +10,7 @@ interface TextareaAutosizeProps extends TextareaHTMLAttributes<HTMLTextAreaEleme
 export const TextareaAutosize = ({ value, className, ...props }: TextareaAutosizeProps) => {
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     
+    // Сustom hook to automatically change textarea height
     useAutosizeTextArea(textareaRef.current, value)
 
     return (

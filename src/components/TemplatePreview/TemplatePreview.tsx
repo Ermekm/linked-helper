@@ -1,7 +1,8 @@
-import { FC, useEffect, useState } from 'react';
+import { FC, useContext, useEffect, useState } from 'react';
 import cls from './TemplatePreview.module.css'
-import { Template } from '../../types';
+import { IModalContext, Template } from '../../types';
 import { msgGenerator } from '../../helpers/msgGenerator/msgGenerator';
+import { ModalContext } from '../../context/modalContext';
 
 interface InputValues {
     [key: string]: string;
@@ -10,12 +11,12 @@ interface InputValues {
 interface TemplatePreviewProps {
     arrVarNames: string[],
     template: Template,
-    onClose: () => void
 }
 
-export const TemplatePreview: FC<TemplatePreviewProps> = ({ arrVarNames, template, onClose }) => {
+export const TemplatePreview: FC<TemplatePreviewProps> = ({ arrVarNames, template }) => {
     const [inputValues, setInputValues] = useState<InputValues>(createObjectFromArray(arrVarNames));
     const [msg, setMsg] = useState<string>(msgGenerator(template, inputValues))
+    const modal = useContext(ModalContext) as IModalContext
 
     useEffect(() => {
         setMsg(msgGenerator(template, inputValues))
@@ -28,6 +29,7 @@ export const TemplatePreview: FC<TemplatePreviewProps> = ({ arrVarNames, templat
         }));
     };
 
+    // create 'values' object with empty strings for msgGenerator() function
     function createObjectFromArray(array: string[]): { [key: string]: string } {
         const result: InputValues = {};
         for (const item of array) {
@@ -54,7 +56,7 @@ export const TemplatePreview: FC<TemplatePreviewProps> = ({ arrVarNames, templat
             </div>
             <button
                 className={cls.preview__close}
-                onClick={onClose}
+                onClick={modal.destroy}
             >close</button>
         </div>
     )
