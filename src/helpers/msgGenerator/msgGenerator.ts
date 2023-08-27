@@ -24,7 +24,8 @@ function generateMsg(template: Template, id: number, values: { [key: string]: st
         } else {
             str += generateMsg(template, cond.else, values)
         }
-        str += cond.additionalText ? " " + cond.additionalText : ""
+        const additionalText = insertValues(cond.additionalText, values, template.arrVarNames)
+        str += additionalText ? " " + additionalText : ""
     })
 
     return " " + str;

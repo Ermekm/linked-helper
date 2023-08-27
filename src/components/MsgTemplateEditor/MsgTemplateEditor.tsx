@@ -29,12 +29,12 @@ const MsgTemplateEditor: FC<MsgTemplateEditorProps> = ({ arrVarNames, initialTem
         const elements = template.elements
         const elementId = elements[activeElementId] ? activeElementId : Constants.ROOT_ELEMENT_ID
         const conditionId = inputRef.current?.dataset?.conditionId // id of condition to instert text is saved in data-* attribute
-        const conditionToEdit = elements[elementId].conditions.find(cond => cond.id === Number(conditionId))
         const cursorPosition = inputRef.current?.selectionStart || 0;
         const valueToInput = "{" + value + "}"
-        if (conditionToEdit) {
+        if (conditionId) {
             if (!inputRef.current?.name) return
-            const key = inputRef.current?.name as ConditionTextFields // field of condition to insert text is saved in data-* attribute 
+            const key = inputRef.current?.name as ConditionTextFields // field of condition to insert text is saved in data-* attribute
+            const conditionToEdit = elements[elementId].conditions.find(cond => cond.id === Number(conditionId))
             if (!conditionToEdit) return
             const elementValue = conditionToEdit[key]
             const textToInput = elementValue.slice(0, cursorPosition) + valueToInput + elementValue.slice(cursorPosition)
@@ -136,7 +136,7 @@ const MsgTemplateEditor: FC<MsgTemplateEditorProps> = ({ arrVarNames, initialTem
         }
     }
 
-    const setRef = (ref: HTMLTextAreaElement) => {
+    const setRef = (ref: HTMLTextAreaElement | null) => {
         inputRef.current = ref
     }
 

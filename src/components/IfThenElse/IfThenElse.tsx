@@ -10,7 +10,7 @@ interface IfThenElseProps {
     nestingLvl: number,
     label?: string | null,
     setActiveElementId: (id: number) => void,
-    setRef: (ref: HTMLTextAreaElement) => void,
+    setRef: (ref: HTMLTextAreaElement | null) => void,
     editTemplateEl: (templateEl: TemplateElement) => void,
     deleteConditionById: (id: number, elementId: number) => void
 }
@@ -43,6 +43,11 @@ const IfThenElse: FC<IfThenElseProps> = (props) => {
         editTemplateEl(newTemplateEl)
     }
 
+    const onDelete = (conditionId: number, elementId: number): void => {
+        deleteConditionById(conditionId, elementId)
+        setRef(null)
+    }
+
     if (!element) return null
 
     return (
@@ -65,7 +70,7 @@ const IfThenElse: FC<IfThenElseProps> = (props) => {
                     key={cond.id} style={{ marginLeft: `${indentation}px` }}
                 >
                     <button
-                        onClick={() => deleteConditionById(cond.id, element.id)}
+                        onClick={() => onDelete(cond.id, element.id)}
                         className={classNames(cls.deleteBtn, {}, [cls.btn])}
                     >Delete</button>
                     <div className={cls.textareaWrapper}>
