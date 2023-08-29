@@ -31,6 +31,11 @@ export const threeFilledValues = {
     company: "Google",
 }
 
+export const valueAsKey = {
+    firstname: "{company}",
+    company: "Google",
+}
+
 export const templateWithoutConditions: Template = {
     arrVarNames: ["firstname", "lastname", "company", "position"],
     elements: {

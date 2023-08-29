@@ -11,6 +11,7 @@ import {
     templateWithOneCondition, 
     templateWithOneNestedCondition, 
     templateWithoutConditions,
+    valueAsKey,
 } from "./data";
 import { msgGenerator } from "./msgGenerator";
 
@@ -84,6 +85,11 @@ describe('Message Generator', () => {
     test('With extra varName that is not in array', () => {
         expect(msgGenerator(templateWithExtraVarName, filledValues))
             .toBe("HI, John I saw you work at Google as {role}");
+    })
+
+    test('"Values" has the same value as key', () => {
+        expect(msgGenerator(templateWithMissingValue, valueAsKey))
+            .toBe("HI, {company} I saw you work at Google");
     })
 
 });

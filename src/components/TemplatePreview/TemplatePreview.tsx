@@ -20,8 +20,16 @@ export const TemplatePreview: FC<TemplatePreviewProps> = ({ arrVarNames, templat
     const modal = useContext(ModalContext) as IModalContext
 
     useEffect(() => {
+        console.log('render', msg)
+    })
+
+    useEffect(() => {
+        setInputValues(createObjectFromArray(arrVarNames))
+    }, [arrVarNames, template])
+
+    useEffect(() => {
         setMsg(msgGenerator(template, inputValues))
-    }, [inputValues, template])
+    }, [template, inputValues])
 
     const handleInputChange = (placeholder: string, value: string) => {
         setInputValues((prevInputValues) => ({
