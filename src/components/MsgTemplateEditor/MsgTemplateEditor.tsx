@@ -35,6 +35,13 @@ const MsgTemplateEditor: FC<MsgTemplateEditorProps> = ({ arrVarNames, initialTem
         }
     }, [caretPosition])
 
+    useEffect(() => {
+        setTemplate((prev) => ({
+            ...prev,
+            arrVarNames: [...arrVarNames]
+        }))
+    }, [arrVarNames])
+
     // Function that inserts variable name in the text input
     const insertVarNameInInput = (value: string): void => {
         const elements = template.elements
