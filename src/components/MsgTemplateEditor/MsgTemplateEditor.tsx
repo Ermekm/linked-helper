@@ -1,4 +1,4 @@
-import { FC, useContext, useRef, useState } from 'react'
+import { FC, useContext, useEffect, useRef, useState } from 'react'
 import IfThenElse from '../IfThenElse/IfThenElse';
 import { ConditionTextFields, IModalContext, Template, TemplateElement } from '../../types';
 import { Modal } from '../Modal/Modal';
@@ -85,23 +85,45 @@ const MsgTemplateEditor: FC<MsgTemplateEditorProps> = ({ arrVarNames, initialTem
         // createCondition() function returns newCondition and template elements. 
         // Ids of template elements was saved in then, else fields of condition
         const [newCondition, newThenTemplateEl, newElseTemplateEl] = createCondition()
+        const blockName = inputRef.current?.name
         const elementId = template.elements[activeElementId] ? activeElementId : Constants.ROOT_ELEMENT_ID  // if activeElement was deleted insert condition in root element
-        const templateCopy: Template = {
-            ...template,
-            elements: {
-                ...template.elements,
-                [elementId]: {
-                    ...template.elements[elementId],
-                    conditions: [
-                        newCondition,
-                        ...template.elements[elementId].conditions
-                    ]
-                },
-                [newThenTemplateEl.id]: newThenTemplateEl,
-                [newElseTemplateEl.id]: newElseTemplateEl
+        const caretPos = inputRef.current?.selectionStart || 0;
+        let conditionsCopy = [...template.elements[elementId].conditions]
+        if (blockName === 'additionalText') {
+            const conditionId = Number(inputRef.current?.dataset?.conditionId)
+            const condition = template.elements[activeElementId].conditions.find((cond) => cond.id === conditionId)
+            if (condition) {
+                newCondition.additionalText = condition.additionalText.slice(caretPos)
             }
+        } else if (blockName === "text") {
+            newCondition.additionalText = template.elements[activeElementId].text.slice(caretPos)
         }
-        setTemplate(templateCopy)
+        if (blockName === 'additionalText') {
+            const conditionId = Number(inputRef.current?.dataset?.conditionId)
+            const indexOfCurrentCondition = conditionsCopy.findIndex((cond) => cond.id === conditionId)
+            conditionsCopy.splice(indexOfCurrentCondition + 1, 0, newCondition)
+            conditionsCopy[indexOfCurrentCondition].additionalText = conditionsCopy[indexOfCurrentCondition].additionalText.slice(0, caretPos)
+        } else {
+            if (blockName === 'text') {
+                template.elements[elementId].text = template.elements[elementId].text.slice(0, caretPos)
+            }
+            conditionsCopy.unshift(newCondition)
+        }
+        setTemplate((prev) => {
+            return {
+                ...prev,
+                elements: {
+                    ...prev.elements,
+                    [elementId]: {
+                        ...prev.elements[elementId],
+                        conditions: conditionsCopy
+                    },
+                    [newThenTemplateEl.id]: newThenTemplateEl,
+                    [newElseTemplateEl.id]: newElseTemplateEl
+                }
+            }
+        })
+        setCaretPosition(caretPos)
     }
 
 
@@ -124,8 +146,9 @@ const MsgTemplateEditor: FC<MsgTemplateEditorProps> = ({ arrVarNames, initialTem
             })
         }
         setTemplate((prev) => {
+            const additionalText = conditionToDelete.additionalText
             const newConditions = prev.elements[elementId].conditions.filter(cond => cond.id !== conditionId)
-            const templateCopy = { ...prev, elements: { ...prev.elements, [elementId]: { ...prev.elements[elementId], conditions: newConditions } } }
+            const templateCopy = { ...prev, elements: { ...prev.elements, [elementId]: { ...prev.elements[elementId], text: prev.elements[elementId].text + additionalText, conditions: newConditions } } }
             return templateCopy
         })
     }
