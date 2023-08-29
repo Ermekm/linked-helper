@@ -25,13 +25,13 @@ function generateMsg(template: Template, id: number, values: { [key: string]: st
             str += generateMsg(template, cond.else, values)
         }
         const additionalText = insertValues(cond.additionalText, values, template.arrVarNames)
-        str += additionalText ? " " + additionalText : ""
+        str += additionalText
     })
 
-    return " " + str;
+    return str;
 }
 
 export function msgGenerator(template: Template, values: { [key: string]: string }): string {
-    return generateMsg(template, Constants.ROOT_ELEMENT_ID, values).trim()
+    return generateMsg(template, Constants.ROOT_ELEMENT_ID, values)
 }
 

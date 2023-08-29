@@ -3,6 +3,7 @@ import cls from './TemplatePreview.module.css'
 import { IModalContext, Template } from '../../types';
 import { msgGenerator } from '../../helpers/msgGenerator/msgGenerator';
 import { ModalContext } from '../../context/modalContext';
+import { TextareaAutosize } from '../TextareaAutosize/TextareaAutosize';
 
 interface InputValues {
     [key: string]: string;
@@ -41,7 +42,11 @@ export const TemplatePreview: FC<TemplatePreviewProps> = ({ arrVarNames, templat
     return (
         <div className={cls.preview}>
             <h2>Message Preview</h2>
-            <div className={cls.preview__text}>{msg}</div>
+            <TextareaAutosize
+                readOnly
+                value={msg}
+                className={cls.textarea}
+            />
             <h3>Variables</h3>
             <div className={cls.preview__vars}>
                 {arrVarNames.map((el, index) =>
