@@ -78,7 +78,7 @@ describe('Message Generator', () => {
 
     test('With missing value', () => {
         expect(msgGenerator(templateWithMissingValue, twoFilledValues))
-            .toBe("HI, John I saw you work at");
+            .toBe("HI, John I saw you work at ");
     })
 
     test('With extra varName that is not in array', () => {

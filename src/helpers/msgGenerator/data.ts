@@ -47,14 +47,14 @@ export const templateWithOneCondition: Template = {
     elements: {
         [Constants.ROOT_ELEMENT_ID]: {
             id: Constants.ROOT_ELEMENT_ID,
-            text: "Hi,",
+            text: "Hi, ",
             conditions: [
                 {
                     id: 2,
                     if: "{firstname}",
                     then: 3,
                     else: 4,
-                    additionalText: "bye"
+                    additionalText: " bye"
                 }
             ]
         },
@@ -76,7 +76,7 @@ export const templateWithMultipleConditions: Template = {
     elements: {
         [Constants.ROOT_ELEMENT_ID]: {
             id: Constants.ROOT_ELEMENT_ID,
-            text: "Hi,",
+            text: "Hi, ",
             conditions: [
                 {
                     id: 2,
@@ -97,28 +97,28 @@ export const templateWithMultipleConditions: Template = {
                     if: "{company}",
                     then: 9,
                     else: 10,
-                    additionalText: "Bye"
+                    additionalText: " Bye"
                 },
             ]
         },
         3: {
             id: 3,
-            text: "{firstname}, you appeared in my 'You may know' list.",
+            text: "{firstname}, you appeared in my 'You may know' list. ",
             conditions: []
         },
         4: {
             id: 4,
-            text: "You appeared in my 'You may know' list.",
+            text: "You appeared in my 'You may know' list. ",
             conditions: []
         },
         6: {
             id: 6,
-            text: "{lastname}, I'm writing to connect with you.",
+            text: "{lastname}, I'm writing to connect with you. ",
             conditions: []
         },
         7: {
             id: 7,
-            text: "I'm writing to connect with you.",
+            text: "I'm writing to connect with you. ",
             conditions: []
         },
         9: {
@@ -139,7 +139,7 @@ export const templateWithOneNestedCondition: Template = {
     elements: {
         [Constants.ROOT_ELEMENT_ID]: {
             id: Constants.ROOT_ELEMENT_ID,
-            text: "Hi,",
+            text: "Hi, ",
             conditions: [
                 {
                     id: 2,
@@ -160,23 +160,23 @@ export const templateWithOneNestedCondition: Template = {
                     if: "{company}",
                     then: 9,
                     else: 10,
-                    additionalText: "Bye"
+                    additionalText: " Bye"
                 },
             ]
         },
         3: {
             id: 3,
-            text: "{firstname}, you appeared in my 'You may know' list.",
+            text: "{firstname}, you appeared in my 'You may know' list. ",
             conditions: []
         },
         4: {
             id: 4,
-            text: "You appeared in my 'You may know' list.",
+            text: "You appeared in my 'You may know' list. ",
             conditions: []
         },
         6: {
             id: 6,
-            text: "{lastname}, I'm writing to connect with you.",
+            text: "{lastname}, I'm writing to connect with you. ",
             conditions: []
         },
         7: {
@@ -186,7 +186,7 @@ export const templateWithOneNestedCondition: Template = {
         },
         9: {
             id: 9,
-            text: "I'm hoping to expand my network with people from {company}",
+            text: "I'm hoping to expand my network with people from {company} ",
             conditions: [
                 {
                     id: 11,
@@ -220,20 +220,20 @@ export const templateWithMultipleNestedConditions: Template = {
     elements: {
         [Constants.ROOT_ELEMENT_ID]: {
             id: Constants.ROOT_ELEMENT_ID,
-            text: "Hi,",
+            text: "Hi, ",
             conditions: [
                 {
                     id: 2,
                     if: "{firstname}",
                     then: 3,
                     else: 13,
-                    additionalText: "Bye"
+                    additionalText: " Bye"
                 },
             ]
         },
         3: {
             id: 3,
-            text: "{firstname}, you appeared in my 'You may know' list.",
+            text: "{firstname}, you appeared in my 'You may know' list. ",
             conditions: [
                 {
                     id: 4,
@@ -265,22 +265,22 @@ export const templateWithMultipleNestedConditions: Template = {
         },
         5: {
             id: 5,
-            text: "{lastname}, I'm writing to connect with you.",
+            text: "{lastname}, I'm writing to connect with you. ",
             conditions: []
         },
         6: {
             id: 6,
-            text: "I'm writing to connect with you.",
+            text: "I'm writing to connect with you. ",
             conditions: []
         },
         8: {
             id: 8,
-            text: "I'm hoping to expand my network with people from {company}",
+            text: "I'm hoping to expand my network with people from {company} ",
             conditions: []
         },
         9: {
             id: 9,
-            text: "I'm hoping to expand my network with people from your company",
+            text: "I'm hoping to expand my network with people from your company ",
             conditions: []
         },
         1: {

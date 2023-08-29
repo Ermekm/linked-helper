@@ -2,16 +2,31 @@ import { Template, TemplateElement } from "../../types";
 import * as Constants from "../../constansts/index"
 
 // Takes string as an argument and inserts values in the string
-function insertValues(str: string, values: { [key: string]: string }, arrVarNames: string[]): string {
-    let ans = str
-    for (const key in values) {
-        ans = ans.replaceAll("{" + key + "}", values[key])
-    }
+function insertValues(str: string, values: Record<string, string>, arrVarNames: string[]): string {
+    let ans = str;
+
+    const placeholderPattern = /\{(\w+)\}/g;
+
+    // Replace placeholders with corresponding values
+    ans = ans.replace(placeholderPattern, (match, key) => {
+        if (values.hasOwnProperty(key)) {
+            return values[key];
+        }
+        return match; // Keep unmatched placeholders
+    });
+
+    // Remove placeholders corresponding to variable names
     arrVarNames.forEach((varName) => {
-        ans = ans.replaceAll("{" + varName + "}", '')
-    })
-    return ans
+        if (!values.hasOwnProperty(varName)) {
+            const varPlaceholder = "{" + varName + "}";
+            ans = ans.split(varPlaceholder).join('');
+        }
+    });
+
+    return ans;
 }
+
+
 
 // Takes a template, an element ID, and variable values. 
 // Recursively generates a message and returns the resulting message string
