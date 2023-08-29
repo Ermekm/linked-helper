@@ -63,6 +63,7 @@ const IfThenElse: FC<IfThenElseProps> = (props) => {
                         setActiveElementId(element.id)
                         setRef(e.target)
                     }}
+                    key={element.id + "text"}
                 />
             </div>
             {element.conditions && element.conditions.map((cond) =>
@@ -86,6 +87,7 @@ const IfThenElse: FC<IfThenElseProps> = (props) => {
                                 setActiveElementId(element.id)
                             }}
                             rows={1}
+                            key={element.id + "if"}
                         />
                     </div>
                     <IfThenElse
@@ -117,6 +119,7 @@ const IfThenElse: FC<IfThenElseProps> = (props) => {
                             setRef(e.target)
                             setActiveElementId(element.id)
                         }}
+                        key={element.id + "additionalText"}
                     />
                 </div>
             )}

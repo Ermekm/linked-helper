@@ -18,18 +18,29 @@ interface MsgTemplateEditorProps {
 }
 
 const MsgTemplateEditor: FC<MsgTemplateEditorProps> = ({ arrVarNames, initialTemplate, callbackSave, onClose }) => {
-    const [template, setTemplate] = useState<Template>(initialTemplate || createTemplate(arrVarNames)) // If the template from the props is null create empty template
+    const [template, setTemplate] = useState<Template>(initialTemplate || createTemplate(arrVarNames)) // If the template from the props is null creates empty template
     const [activeElementId, setActiveElementId] = useState<number>(Constants.ROOT_ELEMENT_ID)
     const inputRef = useRef<HTMLTextAreaElement | null>(null);
     const modal = useContext(ModalContext) as IModalContext
+    const [caretPosition, setCaretPosition] = useState<number | null>(null)
 
+    // Sets input's caret position
+    // useEffect hook is used in order to set caret position after render
+    useEffect(() => {
+        if (caretPosition !== null) {
+            setCaret(caretPosition)
+        }
+        return () => {
+            setCaretPosition(null)
+        }
+    }, [caretPosition])
 
     // Function that inserts variable name in the text input
     const insertVarNameInInput = (value: string): void => {
         const elements = template.elements
         const elementId = elements[activeElementId] ? activeElementId : Constants.ROOT_ELEMENT_ID
         const conditionId = inputRef.current?.dataset?.conditionId // id of condition to instert text is saved in data-* attribute
-        const cursorPosition = inputRef.current?.selectionStart || 0;
+        const caretPos = inputRef.current?.selectionStart || 0;
         const valueToInput = "{" + value + "}"
         if (conditionId) {
             if (!inputRef.current?.name) return
@@ -37,33 +48,36 @@ const MsgTemplateEditor: FC<MsgTemplateEditorProps> = ({ arrVarNames, initialTem
             const conditionToEdit = elements[elementId].conditions.find(cond => cond.id === Number(conditionId))
             if (!conditionToEdit) return
             const elementValue = conditionToEdit[key]
-            const textToInput = elementValue.slice(0, cursorPosition) + valueToInput + elementValue.slice(cursorPosition)
-            setTemplate((prev) => {
-                const templateCopy = {
-                    ...prev,
-                    elements: {
-                        ...prev.elements,
-                        [elementId]: {
-                            ...prev.elements[elementId],
-                            conditions: prev.elements[elementId].conditions.map(cond => {
-                                return cond.id === Number(conditionId)
-                                    ? { ...cond, [key]: textToInput }
-                                    : cond
+            const textToInput = elementValue.slice(0, caretPos) + valueToInput + elementValue.slice(caretPos)
+            setTemplate(
+                (prev) => {
+                    const templateCopy = {
+                        ...prev,
+                        elements: {
+                            ...prev.elements,
+                            [elementId]: {
+                                ...prev.elements[elementId],
+                                conditions: prev.elements[elementId].conditions.map(cond => {
+                                    return cond.id === Number(conditionId)
+                                        ? { ...cond, [key]: textToInput }
+                                        : cond
+                                }
+                                )
                             }
-                            )
                         }
                     }
+                    return templateCopy
                 }
-                return templateCopy
-            })
+            )
         } else {
             const elementValue = elements[elementId].text;
-            const textToInput = elementValue.slice(0, cursorPosition) + valueToInput + elementValue.slice(cursorPosition)
+            const textToInput = elementValue.slice(0, caretPos) + valueToInput + elementValue.slice(caretPos)
             setTemplate((prev) => {
                 const templateCopy = { ...prev, elements: { ...prev.elements, [elementId]: { ...prev.elements[elementId], text: textToInput } } }
                 return templateCopy
             })
         }
+        setCaretPosition(caretPos + valueToInput.length)
     };
 
     // Adds new condition to the template
@@ -143,6 +157,14 @@ const MsgTemplateEditor: FC<MsgTemplateEditorProps> = ({ arrVarNames, initialTem
     const openTemplatePreview = () => {
         modal.start()
         modal.setContent(<TemplatePreview arrVarNames={arrVarNames} template={template} />)
+    }
+
+    const setCaret = (position: number) => {
+        if (inputRef.current) {
+            inputRef.current.focus()
+            inputRef.current.selectionStart = position
+            inputRef.current.selectionEnd = position
+        }
     }
 
 
