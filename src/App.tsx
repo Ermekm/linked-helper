@@ -25,11 +25,11 @@ function App() {
           className="editMsgBtn"
         >Message Editor</button>
         <Drawer isActive={msgTemplateEditorActive} onClose={() => setMsgTemplateEditorActive(false)}>
-          <MsgTemplateEditor
+          {msgTemplateEditorActive && <MsgTemplateEditor
             arrVarNames={arrVarNames}
             initialTemplate={template}
             callbackSave={callbackSave}
-            onClose={() => setMsgTemplateEditorActive(false)} />
+            onClose={() => setMsgTemplateEditorActive(false)} />}
         </Drawer>
       </div>
     </ModalContext.Provider>
